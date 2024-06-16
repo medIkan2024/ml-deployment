@@ -4,8 +4,6 @@ FROM python:3.9-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV MODEL_URL=https://storage.googleapis.com/bucket-ml-medikan/model/model.h5
-ENV GCS_BUCKET_NAME=profile-user-medikan
 
 # Buat direktori kerja untuk aplikasi
 WORKDIR /app
