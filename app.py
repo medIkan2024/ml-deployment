@@ -1,4 +1,5 @@
 from flask import Flask, json, request, jsonify
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from PIL import Image
@@ -10,8 +11,6 @@ from datetime import datetime
 from gcs_utils import upload_image_to_gcs
 from dotenv import load_dotenv
 import os
-
-# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
@@ -22,7 +21,6 @@ GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME")
 
 # Load the pre-trained Keras model
 response = requests.get(model_url)
-# Buat file sementara untuk menyimpan model
 with tempfile.NamedTemporaryFile(suffix=".h5", delete=False) as tf:
     tf.write(response.content)
     model_path = tf.name
@@ -58,10 +56,10 @@ def predict():
             image_url = upload_image_to_gcs(image_bytes, GCS_BUCKET_NAME, destination, file.content_type)
 
             # Load the image from bytes
-            image = Image.open(BytesIO(image_bytes)).resize((150, 150))  # Adjust target_size as per your model's input size
+            image = Image.open(BytesIO(image_bytes)).resize((150, 150)) 
             image = img_to_array(image)
             image = np.expand_dims(image, axis=0)
-            image = image / 255.0  # Normalize the image
+            image = image / 255.0
 
             # Make prediction
             predictions = model.predict(image)
@@ -97,8 +95,6 @@ def predict():
                 data=json.dumps(history_data), 
                 headers={'Content-Type': 'application/json'}
             )
-
-            print("berhasil")
 
             if history_response.status_code != 200:
                 return jsonify({"error": "Failed to add to history"}), 500
